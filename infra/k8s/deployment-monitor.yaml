@@ -1,0 +1,49 @@
+# infra/k8s/deployment-monitor.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: limit-order-monitor
+  namespace: onchainos
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: limit-order-monitor
+  template:
+    metadata:
+      labels:
+        app: limit-order-monitor
+    spec:
+      containers:
+      - name: monitor
+        image: okx/onchainos-limit-order:v1.0.0
+        command: ["node", "dist/workers/monitor.worker.js"]
+        ports:
+        - containerPort: 8080
+        env:
+        - name: REDIS_HOST
+          value: redis-master
+        - name: TEE_ENDPOINT
+          value: https://tee.okx.com
+        - name: NODE_ENV
+          value: production
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
