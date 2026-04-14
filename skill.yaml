@@ -1,0 +1,29 @@
+name: uniswap-v4-limit-order
+version: 1.0.0
+description: Limit orders using live X Layer Uniswap V4 without custom hooks.
+
+requires:
+  skills:
+    - name: uniswap-pool-data
+      version: '>=1.0.0'
+      purpose: Price discovery from live X Layer V4 pools
+    - name: uniswap-quote
+      version: '>=1.0.0'
+      purpose: Swap output validation
+    - name: uniswap-swap
+      version: '>=1.0.0'
+      purpose: Order execution
+    - name: okx-agentic-wallet
+      version: '>=1.0.0'
+      purpose: TEE wallet signing
+
+provides:
+  operations: [place, monitor, execute, cancel, list, quote]
+
+chains:
+  - x_layer
+
+storage:
+  type: local
+  path: ~/.limit_orders/x_layer
+  encryption: optional

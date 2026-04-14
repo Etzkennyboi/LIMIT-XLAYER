@@ -1,0 +1,10 @@
+# Uniswap V4 Limit Order Skill Rules
+
+- **Price Math**: Always use `utils/price_math.py`. Never implement sqrtPrice calculations inline.
+- **Limit Directions**:
+    - Buying (token1 -> token0): currentPrice <= targetPrice.
+    - Selling (token0 -> token1): currentPrice >= targetPrice.
+- **Storage**: Always use `utils/storage.py` (IntentStorage class). Do not perform raw file I/O on `~/.limit_orders`.
+- **Error Handling**: Every order operation must be wrapped in a transaction-like isolation (try/except) to avoid state corruption.
+- **Chain ID**: Hardcode or default to `196` (X Layer) unless explicitly told otherwise.
+- **CLI Outputs**: AI agents expect JSON. Always use `print(json.dumps(...))` for script success/error outputs.
