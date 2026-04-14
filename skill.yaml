@@ -1,0 +1,60 @@
+name: okx-dex-limit-order
+version: 1.0.0
+description: |
+  Production-grade, onchain-native autonomous limit order system.
+  Supports LIMIT_BUY, LIMIT_SELL, STOP_LOSS, and OCO intents via 
+  stateful intent-based trading (Redis + TEE).
+category: trading
+author: Onchain OS Core Team
+tags:
+  - dex
+  - swap
+  - limit-order
+  - oco
+  - automate
+
+# Requirements for the runtime environment
+requirements:
+  services:
+    - redis: ">= 7.0"
+  capabilities:
+    - tee_signing: "required for confirmed transitions"
+    - okx_aggregator: "required for execution"
+
+# Definition of tools available to the AI Agent
+tools:
+  - name: place_order
+    description: Create a new limit order, stop-loss, or OCO intent.
+    parameters:
+      type: object
+      properties:
+        type: { type: string, enum: [LIMIT_BUY, LIMIT_SELL, STOP_LOSS, OCO] }
+        chain: { type: string, enum: [ethereum, arbitrum, optimism, polygon, xlayer, mantle] }
+        tokenIn: { type: string, description: "Contract address of token to sell" }
+        tokenOut: { type: string, description: "Contract address of token to buy" }
+        amount: { type: string, description: "Amount in wei (string)" }
+        triggerPrice: { type: string, description: "Target price in USD (18 decimals)" }
+        slippageBps: { type: number, default: 100 }
+        expiresInHours: { type: number, default: 24 }
+        ocoConfig: { type: object, description: "Required if type is OCO" }
+
+  - name: list_orders
+    description: List active or historical intents by user or status.
+    parameters:
+      type: object
+      properties:
+        status: { type: string, enum: [PENDING, MONITORING, TRIGGERED, SUBMITTED, CONFIRMED, SETTLED, FAILED, REVERTED, CANCELLED, STALE, UNCERTAIN] }
+
+  - name: get_order_details
+    description: Get full state, audit log, and TEE signatures for a specific order.
+    parameters:
+      type: object
+      properties:
+        orderId: { type: string }
+
+  - name: cancel_order
+    description: Terminate a monitoring intent.
+    parameters:
+      type: object
+      properties:
+        orderId: { type: string }

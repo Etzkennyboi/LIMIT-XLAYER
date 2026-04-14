@@ -2,6 +2,7 @@
   "name": "okx-dex-limit-order",
   "version": "1.0.0",
   "description": "Production-grade, onchain-native autonomous trading primitive",
+  "type": "module",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

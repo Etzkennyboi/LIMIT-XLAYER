@@ -1,5 +1,4 @@
-// src/services/RedisService.ts
-import Redis from 'ioredis';
+import { Redis } from 'ioredis';
 import { Intent, IntentStatus, StateTransition } from '../types.js';
 import { config } from '../config.js';
 import { logger } from '../utils/logger.js';
@@ -13,9 +12,9 @@ export class RedisService {
       host:     config.REDIS_HOST,
       port:     config.REDIS_PORT,
       password: config.REDIS_PASSWORD,
-      retryStrategy: (times) => Math.min(times * 200, 5000),
+      retryStrategy: (times: number) => Math.min(times * 200, 5000),
     });
-    this.client.on('error', (err) =>
+    this.client.on('error', (err: Error) =>
       logger.error('Redis error', { error: err.message })
     );
   }
@@ -107,7 +106,7 @@ export class RedisService {
 
   async getIntentsByStatus(status: IntentStatus): Promise<Intent[]> {
     const ids = await this.client.smembers(`lo:status:${status}`);
-    const intents = await Promise.all(ids.map(id => this.getIntent(id)));
+    const intents = await Promise.all(ids.map((id: string) => this.getIntent(id)));
     return intents.filter(Boolean) as Intent[];
   }
 
@@ -139,11 +138,11 @@ export class RedisService {
   async getAuditLog(intentId: string, count = 100): Promise<StateTransition[]> {
     const entries = await this.client.xrevrange('lo:audit', '+', '-', 'COUNT', count);
     return entries
-      .filter(([, fields]) => {
+      .filter(([, fields]: [string, string[]]) => {
         const idIdx = fields.indexOf('intentId');
         return idIdx >= 0 && fields[idIdx + 1] === intentId;
       })
-      .map(([, fields]) => {
+      .map(([, fields]: [string, string[]]) => {
         const get = (k: string) => fields[fields.indexOf(k) + 1];
         return {
           intentId:  get('intentId'),
