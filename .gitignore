@@ -2,6 +2,10 @@
 .env
 .env.local
 
+# Node
+node_modules/
+dist/
+
 # Python
 __pycache__/
 *.py[cod]
@@ -9,8 +13,7 @@ __pycache__/
 venv/
 ENV/
 
-# Local storage (Order intents should not be committed to Git)
-# We ignore the home directory path used in storage.py by default
+# Local storage
 .limit_orders/
 
 # OS
