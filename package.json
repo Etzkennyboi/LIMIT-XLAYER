@@ -9,7 +9,8 @@
     "start": "node dist/index.js",
     "monitor": "node dist/workers/monitor.worker.js",
     "execution": "node dist/workers/execution.worker.js",
-    "test": "jest"
+    "test": "jest",
+    "order": "npx ts-node src/simple-cli.ts"
   },
   "dependencies": {
     "axios": "^1.6.0",
