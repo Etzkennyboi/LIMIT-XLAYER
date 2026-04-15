@@ -10,7 +10,8 @@
     "monitor": "node dist/workers/monitor.worker.js",
     "execution": "node dist/workers/execution.worker.js",
     "test": "jest",
-    "order": "npx ts-node src/simple-cli.ts"
+    "order": "npx ts-node src/simple-cli.ts",
+    "real-order": "npx ts-node src/real-limit-cli.ts"
   },
   "dependencies": {
     "axios": "^1.6.0",

@@ -131,17 +131,38 @@ function parseCommand(input: string): { action: string; params: any } | null {
     /buy\s+\$?(\d+(?:\.\d+)?)\s*(?:\$)?\s+of\s+(\w+)\s+(?:at|when price is|when)\s+\$?(\d+(?:\.\d+)?)/,
     // "limit buy 1 okb at 80"
     /limit\s+buy\s+(\d+(?:\.\d+)?)\s+(\w+)\s+at\s+\$?(\d+(?:\.\d+)?)/,
+    // "0.5 usdt buy of okb at 84" - buying TOKEN with AMOUNT of CURRENCY at PRICE
+    /(\d+(?:\.\d+)?)\s+(\w+)\s+buy\s+of\s+(\w+)\s+at\s+\$?(\d+(?:\.\d+)?)/,
   ];
   
   for (const pattern of buyPatterns) {
     const match = lower.match(pattern);
     if (match) {
-      const amount = parseFloat(match[1]);
-      const token = match[2].toLowerCase();
-      const price = parseFloat(match[3]);
+      let amount, token, price, amountIsUsd;
+      if (match.length === 4) {
+        // Standard patterns: amount, token, price
+        amount = parseFloat(match[1]);
+        token = match[2].toLowerCase();
+        price = parseFloat(match[3]);
+        amountIsUsd = lower.includes('$') || input.includes('$');
+      } else if (match.length === 5) {
+        // New pattern: amount, currency, token, price
+        // "0.5 usdt buy of okb at 84" - using USDT to buy OKB
+        // amount = 0.5 USDT (spending currency)
+        // token = okb (what we're buying)
+        // price = 84 (price per OKB in USD)
+        const spendingAmount = parseFloat(match[1]); // 0.5
+        const spendingCurrency = match[2].toLowerCase(); // usdt
+        token = match[3].toLowerCase(); // okb
+        price = parseFloat(match[4]); // 84
+        
+        // Calculate how much OKB we can buy: spendingAmount / price
+        amount = spendingAmount / price;
+        amountIsUsd = false; // Show the actual token amount, not USD
+      }
       return {
         action: 'create_buy',
-        params: { amount, token, price, amountIsUsd: lower.includes('$') || input.includes('$') }
+        params: { amount, token, price, amountIsUsd }
       };
     }
   }
